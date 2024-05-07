@@ -36,6 +36,12 @@ class Component {
     this._domNode = this.render();
     return this._domNode;
   }
+
+  update() {
+    const newDomNode = this.render();
+    this._domNode.parentNode.replaceChild(newDomNode, this._domNode);
+    this._domNode = newDomNode;
+  }
 }
 
 class TodoList extends Component {
@@ -48,25 +54,56 @@ class TodoList extends Component {
   }
 
   onAddTask = () => {
-    console.log(this.state.currentInput);
     this.state.tasks.push(this.state.currentInput);
-    console.log(this.state.tasks);
+    this.update();
   };
 
   onAddInputChange = () => {
     this.state.currentInput = document.getElementById("new-todo").value;
   };
 
+  onDeleteBtnClick = (text) => {
+
+  }
+
+  createCheckBox = function(){
+    let doneBox = createElement("input", { type: "checkbox" });
+    doneBox.addEventListener("change", () => {
+      const elem = doneBox.nextElementSibling;
+      if (doneBox.checked) {
+        elem.style.color = "gray";
+      } else {
+        elem.style.color = "black";
+      }
+    });
+    return doneBox;
+  }
+
+  createdeleteBtn = function(){
+    const btn = createElement("button", {}, "🗑️");
+    btn.addEventListener("click", () => {
+      const text = btn.previousSibling.innerText;
+      const index = this.state.tasks.indexOf(text);
+      if(index !== -1){
+        this.state.tasks.splice(index, 1);
+        this.update();
+      }
+    });
+    return btn;
+  }
+
   render() {
     let elements = [];
     for(let str of this.state.tasks){
       const elem = createElement("li", {}, [
-          createElement("input", { type: "checkbox" }),
-          createElement("label", {}, str),
-          createElement("button", {}, "🗑️")
-        ]);
-        elements.push(elem);
+        this.createCheckBox(),
+        createElement("label", {}, str),
+        this.createdeleteBtn()
+      ]);
+      elements.push(elem);
     }
+
+
     return createElement("div", { class: "todo-list" }, [
       createElement("h1", {}, "TODO List"),
       createElement("div", { class: "add-todo" }, [
