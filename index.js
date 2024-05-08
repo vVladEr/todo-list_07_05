@@ -75,6 +75,7 @@ class Task extends Component{
     super();
     this.onDeleteTask = onDeleteTask;
     this.taskText = taskText;
+    this.state = {deleteClicks: 0};
   }
   createCheckBox = function(){
     let doneBox = createElement("input", { type: "checkbox" });
@@ -92,9 +93,16 @@ class Task extends Component{
   createDeleteBtn = function(){
     const btn = createElement("button", {}, "🗑️");
     btn.addEventListener("click", () => {
-      const task = btn.parentNode;
-      const index = Array.prototype.indexOf.call(task.parentNode.children, task);
-      this.onDeleteTask(index);
+      if(this.state.deleteClicks > 0){
+        const task = btn.parentNode;
+        const index = Array.prototype.indexOf.call(task.parentNode.children, task);
+        this.onDeleteTask(index);
+      }
+      else{
+        btn.style.background = "red";
+        this.state.deleteClicks++;
+      }
+
     });
     return btn;
   }
